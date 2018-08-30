@@ -1,6 +1,6 @@
 id: stemnet
-docker_repository: dynverse/dynmethods:stemnet
-container_url: https://github.com/dynverse/dynmethods/tree/master/containers/stemnet
+docker_repository: dynverse/ti_stemnet
+container_url: https://github.com/dynverse/ti_stemnet
 name: STEMNET
 type: algorithm
 platform: R
