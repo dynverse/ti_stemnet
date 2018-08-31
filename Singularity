@@ -8,9 +8,10 @@ Bootstrap: shub
 From: dynverse/dynwrap:r
 
 %labels
-    version 0.1.0
+    version 0.1.1
 
 %post
+    chmod -R a+r /code
     apt-get install -y libgsl-dev
     R -e 'devtools::install_git("https://git.embl.de/velten/STEMNET/")'
 
