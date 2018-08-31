@@ -12,6 +12,7 @@ From: dynverse/dynwrap:r
 
 %post
     chmod -R a+r /code
+    chmod a+x /code
     apt-get install -y libgsl-dev
     R -e 'devtools::install_git("https://git.embl.de/velten/STEMNET/")'
 
