@@ -10,14 +10,13 @@ From: dynverse/dynwrap:r
 %labels
     version 0.1.1
 
-%post
-    chmod -R a+r /code
-    chmod a+x /code
-    apt-get install -y libgsl-dev
-    R -e 'devtools::install_git("https://git.embl.de/velten/STEMNET/")'
-
 %files
     . /code
+
+%post
+    chmod -R 755 '/code'
+    apt-get install -y libgsl-dev
+    R -e 'devtools::install_git("https://git.embl.de/velten/STEMNET/")'
 
 %runscript
     exec Rscript /code/run.R
