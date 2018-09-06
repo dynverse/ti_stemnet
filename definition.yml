@@ -1,5 +1,6 @@
 id: stemnet
 docker_repository: dynverse/ti_stemnet
+singularity_collection: 1583
 container_url: https://github.com/dynverse/ti_stemnet
 name: STEMNET
 type: algorithm
