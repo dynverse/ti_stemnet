@@ -1,56 +1,61 @@
-id: stemnet
-docker_repository: dynverse/ti_stemnet
-singularity_collection: 1583
-container_url: https://github.com/dynverse/ti_stemnet
-name: STEMNET
-source: tool
-platform: R
-parameters:
-  alpha:
-    description: The elastic net mixing parameter of the ‘glmnet’ classifier.
-    type: numeric
-    default: 0.1
-    lower: 0.001
-    upper: 10
-  lambda_auto:
-    description: Whether to select the lambda by cross-validation
-    type: logical
-    default: yes
-  lambda:
-    description: The lambda penalty of GLM.
-    type: numeric
-    default: 0.1
-    lower: 0.05
-    upper: 1
-  force:
-    description: Do not use! This is a parameter to force FateID to run on benchmark datasets
-      where not enough end groups are present.
-    type: logical
-    default: no
-    tunable: no
-input:
-  format: rds
-  required:
+method:
+  id: stemnet
+  name: STEMNET
+  tool_id: stemnet
+  source: tool
+  platform: R
+  url: https://git.embl.de/velten/STEMNET
+  license: GPL-3
+  authors:
+  - given: Lars
+    family: Velten
+    email: velten@embl.de
+    ORCID: 0000-0002-1233-5874
+
+manuscript:
+  doi: 10.1038/ncb3493
+  google_scholar_cluster_id: '2729547640192717338'
+  publication_date: '2016-08-25'
+
+container:
+  url: https://github.com/dynverse/ti_stemnet
+  docker: dynverse/ti_stemnet
+
+wrapper:
+  type: end_state_probabilities
+  topology_inference: parameter
+  trajectory_types:
+  - bifurcation
+  - multifurcation
+  example: /code/example.R
+  input_required:
   - expression
   - end_id
   - groups_id
-output:
-  format: rds
-  outputs:
-  - end_state_probabilities
-  - timings
-wrapper_type: end_state_probabilities
-doi: 10.1038/ncb3493
-google_scholar_cluster_id: '2729547640192717338'
-trajectory_types:
-- bifurcation
-- multifurcation
-topology_inference: parameter
-license: GPL-3
-authors:
-- given: Lars
-  family: Velten
-  email: velten@embl.de
-  ORCID: 0000-0002-1233-5874
-publication_date: '2016-08-25'
-code_url: https://git.embl.de/velten/STEMNET
+
+parameters:
+  - id: alpha
+    description: The elastic net mixing parameter of the ‘glmnet’ classifier.
+    type: numeric
+    default: 0.1
+    distribution:
+      type: expuniform
+      lower: 0.001
+      upper: 10
+  - id: lambda_auto
+    description: Whether to select the lambda by cross-validation
+    type: logical
+    default: yes
+  - id: lambda
+    description: The lambda penalty of GLM.
+    type: numeric
+    default: 0.1
+    distribution:
+      type: expuniform
+      lower: 0.05
+      upper: 1
+  - id: force
+    description: Do not use! This is a parameter to force STEMNET to run on benchmark datasets
+      where not enough end groups are present.
+    type: logical
+    default: no
