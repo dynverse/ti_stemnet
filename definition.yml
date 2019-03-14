@@ -27,7 +27,6 @@ wrapper:
   trajectory_types:
   - bifurcation
   - multifurcation
-  example: /code/example.R
   input_required:
   - expression
   - end_id
