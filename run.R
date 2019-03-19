@@ -15,7 +15,7 @@ library(STEMNET)
 
 
 expression <- as.matrix(task$expression)
-params <- task$params
+parameters <- task$parameters
 end_id <- task$priors$end_id
 groups_id <- task$priors$groups_id
 
@@ -35,7 +35,7 @@ end_groups <- intersect(end_groups, names(table(grouping) %>% keep(~. > 2)))
 if (length(end_groups) < 2) {
   msg <- paste0("STEMNET requires at least two end cell populations, but according to the prior information there are only ", length(end_groups), " end populations!")
 
-  if (!identical(params$force, TRUE)) {
+  if (!identical(parameters$force, TRUE)) {
     stop(msg)
   }
 
@@ -55,13 +55,13 @@ stemnet_pop <- rep(NA, nrow(expression))
 stemnet_pop[which(grouping %in% end_groups)] <- grouping[which(grouping %in% end_groups)]
 
 # run STEMNET
-if (params$lambda_auto) {params$lambda <- NULL}
+if (parameters$lambda_auto) {parameters$lambda <- NULL}
 
 output <- STEMNET::runSTEMNET(
   expression,
   stemnet_pop,
-  alpha = params$alpha,
-  lambda = params$lambda
+  alpha = parameters$alpha,
+  lambda = parameters$lambda
 )
 
 # extract pseudotime and proabilities
