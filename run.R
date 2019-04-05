@@ -1,26 +1,21 @@
-library(jsonlite)
-library(readr)
-library(dplyr)
-library(purrr)
-library(tibble)
+#!/usr/local/bin/Rscript
 
-library(STEMNET)
+task <- dyncli::main()
+
+library(dplyr, warn.conflicts = FALSE)
+library(purrr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+
+library(STEMNET, warn.conflicts = FALSE)
 
 #   ____________________________________________________________________________
 #   Load data                                                               ####
 
-data <- read_rds('/ti/input/data.rds')
-params <- jsonlite::read_json('/ti/input/params.json')
 
-#' @examples
-#' data <- dyntoy::generate_dataset(id = "test", num_cells = 300, num_features = 300, model = "bifurcating") %>% c(., .$prior_information)
-#' params <- yaml::read_yaml("containers/stemnet/definition.yml")$parameters %>%
-#'   {.[names(.) != "forbidden"]} %>%
-#'   map(~ .$default)
-
-expression <- data$expression
-end_id <- data$end_id
-groups_id <- data$groups_id
+expression <- as.matrix(task$expression)
+parameters <- task$parameters
+end_id <- task$priors$end_id
+groups_id <- task$priors$groups_id
 
 #   ____________________________________________________________________________
 #   Infer trajectory                                                        ####
@@ -38,7 +33,7 @@ end_groups <- intersect(end_groups, names(table(grouping) %>% keep(~. > 2)))
 if (length(end_groups) < 2) {
   msg <- paste0("STEMNET requires at least two end cell populations, but according to the prior information there are only ", length(end_groups), " end populations!")
 
-  if (!identical(params$force, TRUE)) {
+  if (!identical(parameters$force, TRUE)) {
     stop(msg)
   }
 
@@ -58,27 +53,28 @@ stemnet_pop <- rep(NA, nrow(expression))
 stemnet_pop[which(grouping %in% end_groups)] <- grouping[which(grouping %in% end_groups)]
 
 # run STEMNET
-if (params$lambda_auto) {params$lambda <- NULL}
+if (parameters$lambda_auto) {parameters$lambda <- NULL}
 
 output <- STEMNET::runSTEMNET(
   expression,
   stemnet_pop,
-  alpha = params$alpha,
-  lambda = params$lambda
+  alpha = parameters$alpha,
+  lambda = parameters$lambda
 )
 
 # extract pseudotime and proabilities
 pseudotime <- STEMNET:::primingDegree(output)
 end_state_probabilities <- output@posteriors %>% as.data.frame() %>% rownames_to_column("cell_id")
 
-checkpoints$method_aftermethod <- as.numeric(Sys.time())
-
-output <- lst(
-  cell_ids = names(pseudotime),
-  end_state_probabilities,
-  pseudotime,
-  timings = checkpoints
-)
 #   ____________________________________________________________________________
 #   Save output & process output                                            ####
-write_rds(output, "/ti/output/output.rds")
+
+output <- dynwrap::wrap_data(cell_ids = names(pseudotime)) %>%
+  dynwrap::add_end_state_probabilities(
+    end_state_probabilities = end_state_probabilities,
+    pseudotime = pseudotime
+  ) %>%
+  dynwrap::add_timings(timings = checkpoints)
+
+output %>% dyncli::write_output(task$output)
+
